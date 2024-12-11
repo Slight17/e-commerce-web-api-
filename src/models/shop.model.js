@@ -4,7 +4,7 @@ import { kMaxLength } from 'buffer';
 import mongoose, { model, Schema, Types } from 'mongoose';
 
 const DOCUMENT_NAME = 'Shop';
-const COLLECTION_NAME = 'Shop';
+const COLLECTION_NAME = 'Shops';
 
 const shopScheme = new Schema(
     {
@@ -47,4 +47,4 @@ const shopScheme = new Schema(
     }
 );
 
-export default mongoose.model(DOCUMENT_NAME, shopScheme)
+export default  mongoose.model(DOCUMENT_NAME, shopScheme)

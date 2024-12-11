@@ -4,7 +4,7 @@
 import mongoose, { model, Schema, Types } from 'mongoose';
 
 const DOCUMENT_NAME = 'Key';
-const COLLECTION_NAME = 'Key';
+const COLLECTION_NAME = 'Keys';
 
 const keyTokenScheme = new Schema(
     {
@@ -34,4 +34,4 @@ const keyTokenScheme = new Schema(
     }
 );
 
-export default model(DOCUMENT_NAME, keyTokenScheme)
+export default  mongoose.model(DOCUMENT_NAME, keyTokenScheme)

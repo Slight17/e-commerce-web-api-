@@ -68,7 +68,8 @@ class AccessService {
 
                 // create token pair  
                 const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
-
+                const refeshToken = await tokens.refeshToken
+                await keyStore.refreshToken.push(refeshToken)
                 console.log(`created token successfully`, tokens)
 
                 return {
