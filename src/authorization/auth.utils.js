@@ -2,7 +2,7 @@
 
 import jwt from 'jsonwebtoken';
 
-const createTokenPair =  async (payload, publicKey, privateKey) =>{
+const  createTokenPair =  async (payload, publicKey, privateKey) =>{
 
     try {
         //access token 
