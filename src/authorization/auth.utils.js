@@ -13,13 +13,13 @@ const  createTokenPair =  async (payload, publicKey, privateKey) =>{
             expiresIn: '7 Days'
         })
 
-        jwt.verify( accessToken, publicKey, (err, decode) =>{
-            if(err){
-                console.error(err);
-            }else{
-                console.log(`decoded: `, decode);         
-            }
-        })
+        // jwt.verify( accessToken, publicKey, (err, decode) =>{
+        //     if(err){
+        //         console.error(err);
+        //     }else{
+        //         console.log(`decoded: `, decode);         
+        //     }
+        // })
 
         return { accessToken, refreshToken};
         

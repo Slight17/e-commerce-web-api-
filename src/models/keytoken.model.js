@@ -22,9 +22,13 @@ const keyTokenScheme = new Schema(
             type: String,
             required: true
         },
-        refeshToken:{
+        refeshTokenUsed:{
             type: Array,
             default: []
+        },
+        refeshToken:{
+            type: String,
+            required: true
         }
 
     },
