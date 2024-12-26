@@ -22,6 +22,14 @@ const roleShop = {
     ADMIN: 'ADMIN'
 }
 
+const handleRefreshToken = async(req, res, next) => {
+    return res.status(StatusCode.CREATED).json(await accessService.handleRefreshTokenV2({
+        refreshToken: req.refreshToken,
+        user: req.user,
+        keyStore: req.keyStore
+    }))
+}
+
 const signup = async (req, res, next) => {
     const { name, email, password } = req.body;
     return res.status(StatusCode.CREATED).json(await accessService.signup({ name, email, password }))
@@ -32,7 +40,14 @@ const login = async (req, res, next) => {
     return res.status(StatusCode.OK).json(await accessService.login({ email, password }))
 }
 
+const logout = async (req, res, next) => {
+    console.log(req.keyStore)
+    return res.status(StatusCode.OK).json(await accessService.logout({keyStore: req.keyStore}))
+}
+
 export default {
     signup,
-    login
+    login,
+    logout,
+    handleRefreshToken
 };

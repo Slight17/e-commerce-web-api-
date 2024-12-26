@@ -1,6 +1,8 @@
+import { StatusCodes } from "http-status-codes";
+
 const errorHandlerMiddleware = (req, res, next) => {
     const error = new Error('Not Found');
-    error.status = StatusCode.NOT_FOUND;
+    error.status = StatusCodes.NOT_FOUND;
     next(error);
 }
 
@@ -9,6 +11,7 @@ const errorMiddleware = (error, req, res, next) => {
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
+        stack: error.stack,
         error: {
             message: error.message
         }

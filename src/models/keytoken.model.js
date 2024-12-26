@@ -11,7 +11,7 @@ const keyTokenScheme = new Schema(
         user: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: 'Shop'
+            ref: 'Shop',
         },
         privateKey:{
             type: String,
@@ -22,11 +22,11 @@ const keyTokenScheme = new Schema(
             type: String,
             required: true
         },
-        refeshTokenUsed:{
+        refreshTokenUsed:{
             type: Array,
             default: []
         },
-        refeshToken:{
+        refreshToken:{
             type: String,
             required: true
         }
@@ -37,5 +37,5 @@ const keyTokenScheme = new Schema(
         collections: COLLECTION_NAME
     }
 );
-
-export default  mongoose.model(DOCUMENT_NAME, keyTokenScheme)
+const keyTokenModel =  mongoose.model(DOCUMENT_NAME, keyTokenScheme)
+export default  keyTokenModel
