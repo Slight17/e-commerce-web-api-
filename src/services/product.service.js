@@ -1,8 +1,10 @@
 import productModel from '../models/product.model.js'
 import { ApiError } from '../handles/error.handle.js'
 import { StatusCodes } from 'http-status-codes'
-import { Types } from 'mongoose';
+import { model, Types } from 'mongoose';
 import productRepo from '../models/repositories/product.repo.js';
+import { removeUndefinedObject, updateNestedObjectParsers } from '../utils/index.js';
+import inventoriesRepo from '../models/repositories/inventories.repo.js';
 
 //define Factory class to create product
 class ProductFactory {
@@ -40,11 +42,11 @@ class ProductFactory {
         return new productClass(payload).createProduct()
     }
 
-    static async updateProduct(type, payload) {
+    static async updateProduct(type, prodcutId ,payload) {
         //check type of payload in product class
         const productClass = ProductFactory.productRegistry[type]
         if (!productClass) throw new ApiError(StatusCodes.BAD_REQUEST, `Could not find product class ${type}`)
-        return new productClass(payload).createProduct()
+        return new productClass(payload).updateProduct(prodcutId)
     }
 
 
@@ -76,16 +78,19 @@ class ProductFactory {
         return productRepo.queryProduct({ query, limit, skip })
     }
 
-    static async searchProduct({keySearch}){
-        return productRepo.searchProducts({keySearch})
-    }
-    
-    static async findAllProducts({limit = 50, sort = 'ctime', page = 1, fliter = {isPublished: true}}){
-        return await productRepo.findAllProducst()
+    static async searchProduct({ keySearch }) {
+        return productRepo.searchProducts({ keySearch })
     }
 
-    static async findProduct(){
-        return await productRepo.findProduct()
+    static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, fliter = { isPublished: true } }) {
+        return await productRepo.findAllProducst({
+            limit, sort, page, fliter,
+            select: ['product_name', 'product_price', 'product_thumb']
+        })
+    }
+
+    static async findProduct({product_id}) {
+        return await productRepo.findProduct({product_id, unselect: ['__v']})
     }
 }
 
@@ -123,14 +128,29 @@ class Product {
     }
 
     async createProduct(product_id) {
-        return await productModel.product.create({ ...this, _id: product_id })
+        const createdProduct = await productModel.product.create({ ...this, _id: product_id })
+        if(createdProduct){
+            //add product stock in inventory
+            await inventoriesRepo.insertInventory({
+                product_id: createdProduct._id,
+                stock: createdProduct.product_quantity,
+                shop_id: createdProduct.product_shop
+            })
+
+        }
+
+        return createdProduct
+    }
+    async updateProduct(product_id, objectParams) {
+        // return await productModel.product.findByIdAndUpdate(product_id, {payload}, {new: true})
+        return await productRepo.updateProduct({product_id, objectParams , model: productModel.product})
     }
 }
 
 //define sub-class for different product type Clothing
 
 class Clothing extends Product {
-    async createClothing() {
+    async createProduct() {
         const newClothing = await productModel.clothing.create({
             ...this.product_attributes,
             product_shop: this.product_shop
@@ -142,10 +162,28 @@ class Clothing extends Product {
 
         return newProduct
     }
+
+    async updateProduct(product_id) {
+        console.log(this)
+        const objectParams = removeUndefinedObject(this)
+        console.log(objectParams)
+
+        if (objectParams.product_attributes){
+            await productRepo.updateProduct({
+                product_id,
+                objectParams: updateNestedObjectParsers(objectParams.product_attributes), 
+                model: productModel.clothing})
+            // await productModel.product.findByIdAndUpdate(product_id, objectParams, {new: true})
+
+        }
+
+        const updateProduct = await super.updateProduct(product_id, updateNestedObjectParsers(objectParams))
+        return updateProduct
+    }
 }
 
 class Electronic extends Product {
-    async createElectronic() {
+    async createProduct() {
         const newElectronic = await productModel.electronics.create({
             ...this.product_attributes,
             product_shop: this.product_shop
@@ -157,10 +195,28 @@ class Electronic extends Product {
 
         return newProduct
     }
+
+    async updateProduct(product_id) {
+        console.log(this)
+        const objectParams = removeUndefinedObject(this)
+        console.log(objectParams)
+
+        if (objectParams.product_attributes){
+            await productRepo.updateProduct({
+                product_id,
+                objectParams: updateNestedObjectParsers(objectParams.product_attributes), 
+                model: productModel.electronics})
+            // await productModel.product.findByIdAndUpdate(product_id, objectParams, {new: true})
+
+        }
+
+        const updateProduct = await super.updateProduct(product_id, updateNestedObjectParsers(objectParams))
+        return updateProduct
+    }
 }
 
 class Furniture extends Product {
-    async createFurniture() {
+    async createProduct() {
 
         const newFurniture = await productModel.furniture.create({
             ...this.product_attributes,
@@ -174,6 +230,24 @@ class Furniture extends Product {
         if (!newProduct) throw ApiError(StatusCodes, `Cannot create product class`)
 
         return newProduct
+    }
+
+    async updateProduct(product_id) {
+        console.log(this)
+        const objectParams = removeUndefinedObject(this)
+        console.log(objectParams)
+
+        if (objectParams.product_attributes){
+            await productRepo.updateProduct({
+                product_id,
+                objectParams: updateNestedObjectParsers(objectParams.product_attributes), 
+                model: productModel.furniture})
+            // await productModel.product.findByIdAndUpdate(product_id, objectParams, {new: true})
+
+        }
+
+        const updateProduct = await super.updateProduct(product_id, updateNestedObjectParsers(objectParams))
+        return updateProduct
     }
 }
 

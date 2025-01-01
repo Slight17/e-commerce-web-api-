@@ -2,7 +2,7 @@ import productModel from '../product.model.js'
 import { Types } from 'mongoose'
 import { ApiError } from '../../handles/error.handle.js'
 import { StatusCodes } from 'http-status-codes'
-
+import { getSelectData, unGetSelectData } from '../../utils/index.js'
 
 const queryProduct = async ({ query, limit, skip }) => {
     return await productModel.product.find(query)
@@ -56,22 +56,29 @@ const searchProducts = async ({ keySearch }) => {
     return results
 }
 
-const findAllProducst = async ({ limit, sort, page, fliter, select }) => {
+const findAllProducst = async ({ limit = 50, sort, page = 1, fliter, select }) => {
     const skip = (page - 1) * limit
     const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
-  
+    
     return await productModel.product.find(fliter)
         .sort(sortBy)
         .skip(skip)
         .limit(limit)
-        .select(select)
+        .select(getSelectData(select))
         .lean()
 }
 
-const findProduct = async () => {
-
+const findProduct = async ({ product_id, unselect}) => {
+    return await productModel.product.findById( product_id).select(unGetSelectData(unselect))
 }
 
+//update product
+
+const updateProduct = async ({ product_id, objectParams, model, isNew = true }) => {
+    console.log(objectParams)
+    const updateProduct = await model.findByIdAndUpdate(product_id, objectParams, {new: isNew})
+    return updateProduct
+}
 
 export default {
     queryProduct,
@@ -79,5 +86,6 @@ export default {
     setUnpublishedProduct,
     searchProducts,
     findAllProducst,
-    findProduct
+    findProduct,
+    updateProduct
 }

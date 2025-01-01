@@ -9,6 +9,9 @@ import auth from '../../authorization/auth.utils.js'
 
 
 router.get('/search/:keySearch', asyncHandler(productController.getListSearchProducts))
+router.get('/:product_id', asyncHandler(productController.findProduct))
+router.get('', asyncHandler(productController.findAllProducts))
+
 
 //authentication
 router.use(auth.authenticationV2)
@@ -20,5 +23,6 @@ router.post('/set/unpublished/:id', asyncHandler(productController.postUnpublish
 //route get product
 router.get('/draft/all', asyncHandler(productController.getAllDraftsForShop))
 router.get('/published/all', asyncHandler(productController.getAllPublishForShop))
-
+//
+router.patch('/:productId', asyncHandler(productController.updateProduct))
 export default router
