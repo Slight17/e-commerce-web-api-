@@ -30,16 +30,16 @@ const discountSchema = new mongoose.Schema({
     collection: COLLECTION_NAME
 });
 
-await discountSchema.pre('save', function (next) {
-    // Kiểm tra xem discount_user_used có thay đổi không
-    if (!this.isModified('discount_user_used')) return next();
+// await discountSchema.pre('save', function (next) {
+//     // Kiểm tra xem discount_user_used có thay đổi không
+//     if (!this.isModified('discount_user_used')) return next();
 
-    // Cập nhật discount_max_uses và discount_user_count
-    this.discount_max_uses -= 1; // Giảm số lần sử dụng tối đa
-    this.discount_user_count += 1; // Tăng số lần người dùng đã sử dụng
+//     // Cập nhật discount_max_uses và discount_user_count
+//     this.discount_max_uses -= 1; // Giảm số lần sử dụng tối đa
+//     this.discount_user_count += 1; // Tăng số lần người dùng đã sử dụng
 
-    next();
-});
+//     next();
+// });
 
 //Export the model
 export default mongoose.model(DOCUMENT_NAME, discountSchema)

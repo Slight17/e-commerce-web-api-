@@ -4,6 +4,7 @@ import check from '../authorization/check.auth.js';
 import productRoute from './products/index.products.js'
 import { asyncHandler } from '../utils/asyncHandle.js';
 import discountRoute from './discount/index.discount.js'
+import cartRoute from './cart/index.carts.js'
 
 const routes = express.Router();
 
@@ -17,7 +18,7 @@ routes.use(asyncHandler(check.checkPermission('0000')))
 //     res.status(200).json({ message: 'API is working' });
 // });
 
-
+routes.use('/v1/api/cart', cartRoute)
 routes.use('/v1/api/discount', discountRoute)
 routes.use('/v1/api/product', productRoute)
 routes.use('/v1/api', accessRoute)

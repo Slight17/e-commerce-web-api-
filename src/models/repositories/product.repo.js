@@ -80,6 +80,13 @@ const updateProduct = async ({ product_id, objectParams, model, isNew = true }) 
     return updateProduct
 }
 
+const findProductById = async ({productId}) => {
+    return await productModel.product.findById(new Types.ObjectId(productId))
+}
+
+
+
+
 export default {
     queryProduct,
     setPublishedProduct,
@@ -87,5 +94,6 @@ export default {
     searchProducts,
     findAllProducst,
     findProduct,
-    updateProduct
+    updateProduct,
+    findProductById
 }
