@@ -59,7 +59,7 @@ const searchProducts = async ({ keySearch }) => {
 const findAllProducst = async ({ limit = 50, sort, page = 1, fliter, select }) => {
     const skip = (page - 1) * limit
     const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
-    
+
     return await productModel.product.find(fliter)
         .sort(sortBy)
         .skip(skip)
@@ -68,22 +68,33 @@ const findAllProducst = async ({ limit = 50, sort, page = 1, fliter, select }) =
         .lean()
 }
 
-const findProduct = async ({ product_id, unselect}) => {
-    return await productModel.product.findById( product_id).select(unGetSelectData(unselect))
+const findProduct = async ({ product_id, unselect }) => {
+    return await productModel.product.findById(product_id).select(unGetSelectData(unselect))
 }
 
 //update product
 
 const updateProduct = async ({ product_id, objectParams, model, isNew = true }) => {
     console.log(objectParams)
-    const updateProduct = await model.findByIdAndUpdate(product_id, objectParams, {new: isNew})
+    const updateProduct = await model.findByIdAndUpdate(product_id, objectParams, { new: isNew })
     return updateProduct
 }
 
-const findProductById = async ({productId}) => {
+const findProductById = async ({ productId }) => {
     return await productModel.product.findById(new Types.ObjectId(productId))
 }
 
+const checkProductByServer = async ({ products }) => {
+    return await Promise.all(products.map(async (product) => {
+        const foundProduct = await productModel.product.findById(new Types.ObjectId(product.productId))
+        if (!foundProduct) throw new ApiError(StatusCodes.NOT_FOUND, `Product not found for shop ${product.productId}`)
+        return {
+            product_price: foundProduct.product_price,
+            quantity: foundProduct.product_quantity,
+            productId: foundProduct._id
+        }
+    }))
+}
 
 
 
@@ -95,5 +106,6 @@ export default {
     findAllProducst,
     findProduct,
     updateProduct,
-    findProductById
+    findProductById,
+    checkProductByServer
 }

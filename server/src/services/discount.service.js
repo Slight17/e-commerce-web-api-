@@ -180,12 +180,12 @@ class DiscountServices {
 
         if (foundDiscount.discount_min_order_value > 0) {
             //get total
-            totalOrder = products.reduce((acc, curr) => acc + curr.product_price * curr.quanlity, 0)
+            totalOrder = products.reduce((acc, curr) => acc + curr.product_price * curr.quantity, 0)
+            console.log(`Total order for ${totalOrder}`)
             if (totalOrder < foundDiscount.discount_min_order_value)
                 throw new ApiError(StatusCodes.BAD_REQUEST, `Minimum order value not met`)
         }
 
-        userId = "67624e48771055537a092dcc"
         if (foundDiscount.discount_max_used_per_user > 0) {
             const userUsedDiscount = foundDiscount.discount_user_used.find(user => user.userId === userId)
             if (userUsedDiscount && userUsedDiscount.count >= foundDiscount.discount_max_used_per_user) {

@@ -9,7 +9,7 @@ class CartServices {
         const query = { cart_userId: userId, cart_state: 'active' },
             updateOrInsert = {
                 $addToSet: {
-                    cart_products: cart_products
+                    cart_products: cart_products,
                 }
             },
             options = { upsert: true, new: true };
@@ -17,14 +17,15 @@ class CartServices {
     }
 
     static async updateUserCartQuantity({ userId, cart_products }) {
-        const { productId, shopId, quantity: newQuantity } = cart_products;
+        const { productId, shopId, quantity: newQuantity, old_quantity } = cart_products;
+
 
         const cart = await cartModel.findOne({ cart_userId: userId });
 
         if (!cart) {
             const newCart = await cartModel.create({
                 cart_userId: userId,
-                cart_products: [{ productId: productId, shopId: shopId, quantity: newQuantity, old_quantity: 0 }],
+                cart_products: [{ productId: productId, shopId: shopId, quantity: newQuantity, old_quantity: newQuantity }],
             });
             return newCart;
         }
@@ -53,13 +54,13 @@ class CartServices {
                 productId: productId,
                 shopId: shopId,
                 quantity: newQuantity,
-                old_quantity: 0,
+                old_quantity: newQuantity,
             });
         }
 
         const updatedCart = await cartModel.findOneAndUpdate(
-            { cart_userId: userId },
-            { $set: { cart_products: cart.cart_products } },
+            { cart_userId: userId , cart_state: 'active' },
+            { $set: { cart_products: cart.cart_products} },
             { new: true }
         );
 
@@ -96,6 +97,7 @@ class CartServices {
         if (quantity === 0) { await CartServices.removeProductFromCart({ userId, cartId: userCart._id, productId }) }
 
         if (!userCart) {
+            cart_products.old_quantity = quantity
             return this.createUserCart({ userId, cart_products })
         }
 
